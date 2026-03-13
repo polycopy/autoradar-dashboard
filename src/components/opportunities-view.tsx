@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, useMemo, useEffect, useCallback } from "react";
+import { useState, useMemo, useEffect, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { Radar, SlidersHorizontal, X, RefreshCw } from "lucide-react";
 import { ListingCard } from "./listing-card";
 import type { Listing } from "@/lib/supabase";
+import { useAlerts } from "./alert-provider";
 
 export type ScoredListing = Listing & {
   discount_pct: number;
@@ -23,11 +24,40 @@ export function OpportunitiesView({
   cities: string[];
 }) {
   const router = useRouter();
+  const { addAlert } = useAlerts();
+  const prevIdsRef = useRef<Set<string>>(new Set());
+  const isFirstRender = useRef(true);
+
+  // Detect new A/B listings and fire alerts
+  useEffect(() => {
+    const currentIds = new Set(listings.map((l) => l.fb_listing_id));
+
+    if (isFirstRender.current) {
+      prevIdsRef.current = currentIds;
+      isFirstRender.current = false;
+      return;
+    }
+
+    for (const listing of listings) {
+      if (
+        !prevIdsRef.current.has(listing.fb_listing_id) &&
+        (listing.grade === "A" || listing.grade === "B")
+      ) {
+        addAlert(listing);
+      }
+    }
+
+    prevIdsRef.current = currentIds;
+  }, [listings, addAlert]);
+
   const [gradeFilter, setGradeFilter] = useState<"all" | "A" | "B" | "C">("all");
   const [selectedMakes, setSelectedMakes] = useState<string[]>([]);
   const [priceMin, setPriceMin] = useState("");
   const [priceMax, setPriceMax] = useState("");
   const [selectedCity, setSelectedCity] = useState("");
+  const [yearMin, setYearMin] = useState("");
+  const [yearMax, setYearMax] = useState("");
+  const [kmMax, setKmMax] = useState("");
   const [showFilters, setShowFilters] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [lastRefresh, setLastRefresh] = useState(new Date());
@@ -58,20 +88,26 @@ export function OpportunitiesView({
       if (priceMin && Number(l.price_amount) < Number(priceMin)) return false;
       if (priceMax && Number(l.price_amount) > Number(priceMax)) return false;
       if (selectedCity && l.location_city !== selectedCity) return false;
+      if (yearMin && (l.vehicle_year == null || l.vehicle_year < Number(yearMin))) return false;
+      if (yearMax && (l.vehicle_year == null || l.vehicle_year > Number(yearMax))) return false;
+      if (kmMax && (l.vehicle_odometer_value == null || l.vehicle_odometer_value > Number(kmMax))) return false;
       return true;
     });
-  }, [listings, gradeFilter, selectedMakes, priceMin, priceMax, selectedCity]);
+  }, [listings, gradeFilter, selectedMakes, priceMin, priceMax, selectedCity, yearMin, yearMax, kmMax]);
 
   const countByGrade = (g: string) => listings.filter((l) => l.grade === g).length;
 
   const hasActiveFilters =
-    selectedMakes.length > 0 || priceMin || priceMax || selectedCity;
+    selectedMakes.length > 0 || priceMin || priceMax || selectedCity || yearMin || yearMax || kmMax;
 
   function clearFilters() {
     setSelectedMakes([]);
     setPriceMin("");
     setPriceMax("");
     setSelectedCity("");
+    setYearMin("");
+    setYearMax("");
+    setKmMax("");
   }
 
   function toggleMake(make: string) {
@@ -217,6 +253,48 @@ export function OpportunitiesView({
                   </option>
                 ))}
               </select>
+            </div>
+
+            {/* Año desde */}
+            <div>
+              <label className="block text-xs uppercase tracking-wider text-muted font-medium mb-2">
+                Año desde
+              </label>
+              <input
+                type="number"
+                value={yearMin}
+                onChange={(e) => setYearMin(e.target.value)}
+                placeholder="2010"
+                className="w-full px-3 py-2 rounded-lg bg-surface-2 border border-border-subtle text-foreground text-sm placeholder:text-muted/40 focus:outline-none focus:border-accent/50"
+              />
+            </div>
+
+            {/* Año hasta */}
+            <div>
+              <label className="block text-xs uppercase tracking-wider text-muted font-medium mb-2">
+                Año hasta
+              </label>
+              <input
+                type="number"
+                value={yearMax}
+                onChange={(e) => setYearMax(e.target.value)}
+                placeholder="2024"
+                className="w-full px-3 py-2 rounded-lg bg-surface-2 border border-border-subtle text-foreground text-sm placeholder:text-muted/40 focus:outline-none focus:border-accent/50"
+              />
+            </div>
+
+            {/* Km máximo */}
+            <div>
+              <label className="block text-xs uppercase tracking-wider text-muted font-medium mb-2">
+                Km máximo
+              </label>
+              <input
+                type="number"
+                value={kmMax}
+                onChange={(e) => setKmMax(e.target.value)}
+                placeholder="150.000"
+                className="w-full px-3 py-2 rounded-lg bg-surface-2 border border-border-subtle text-foreground text-sm placeholder:text-muted/40 focus:outline-none focus:border-accent/50"
+              />
             </div>
           </div>
         </div>

@@ -1,7 +1,10 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
 import { MapPin, Clock, Gauge, ChevronDown, Car } from "lucide-react";
 import { formatUSD, formatKm, timeAgo, gradeColor } from "@/lib/utils";
+import { FavoriteButton } from "@/components/favorite-button";
 import type { Listing } from "@/lib/supabase";
 
 export function ListingCard({
@@ -98,6 +101,7 @@ export function ListingCard({
               <span className="text-muted ml-1">{listing.vehicle_year}</span>
             )}
           </h3>
+          <FavoriteButton listingId={listing.fb_listing_id} price={Number(listing.price_amount ?? 0)} />
         </div>
 
         {/* Precio */}

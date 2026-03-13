@@ -25,6 +25,7 @@ import {
 } from "@/lib/queries";
 import { formatUSD, formatKm, timeAgo, gradeColor, discountToGrade } from "@/lib/utils";
 import { ListingCard } from "@/components/listing-card";
+import { FavoriteButton } from "@/components/favorite-button";
 
 export const dynamic = "force-dynamic";
 
@@ -273,7 +274,7 @@ export default async function ListingDetailPage({
             </div>
 
             {/* CTA */}
-            <div className="mt-auto pt-6">
+            <div className="mt-auto pt-6 flex items-center gap-3">
               <a
                 href={listing.listing_url}
                 target="_blank"
@@ -283,6 +284,7 @@ export default async function ListingDetailPage({
                 <ExternalLink className="w-4 h-4" />
                 Ver en {source === "mercadolibre" ? "MercadoLibre" : "Facebook"}
               </a>
+              <FavoriteButton listingId={listing.fb_listing_id} price={price} className="w-10 h-10 text-lg" />
             </div>
           </div>
         </div>

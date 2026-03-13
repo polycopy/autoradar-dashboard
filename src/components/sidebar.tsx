@@ -2,12 +2,15 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Radar, TrendingUp, Calculator, Car, Menu, X } from "lucide-react";
+import { Radar, TrendingUp, Calculator, Car, Menu, X, Heart, Bell, BellOff } from "lucide-react";
 import { useState, useEffect } from "react";
 import { GlobalSearch } from "./global-search";
+import { ThemeToggle } from "./theme-toggle";
+import { useAlerts } from "./alert-provider";
 
 const nav = [
   { href: "/", label: "Oportunidades", icon: Radar },
+  { href: "/favorites", label: "Favoritos", icon: Heart },
   { href: "/market", label: "Mercado", icon: TrendingUp },
   { href: "/valuator", label: "Valuador", icon: Calculator },
 ];
@@ -15,6 +18,7 @@ const nav = [
 export function Sidebar() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const { alertsEnabled, setAlertsEnabled } = useAlerts();
 
   // Close on route change
   useEffect(() => {
@@ -43,12 +47,15 @@ export function Sidebar() {
             AutoRadar
           </span>
         </Link>
-        <button
-          onClick={() => setOpen(!open)}
-          className="w-9 h-9 flex items-center justify-center rounded-lg text-muted hover:text-foreground hover:bg-surface-2 transition-colors"
-        >
-          {open ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-        </button>
+        <div className="flex items-center gap-1">
+          <ThemeToggle />
+          <button
+            onClick={() => setOpen(!open)}
+            className="w-9 h-9 flex items-center justify-center rounded-lg text-muted hover:text-foreground hover:bg-surface-2 transition-colors"
+          >
+            {open ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+          </button>
+        </div>
       </div>
 
       {/* Overlay */}
@@ -113,17 +120,31 @@ export function Sidebar() {
 
         {/* Status */}
         <div className="p-4 border-t border-border-subtle">
-          <div className="flex items-center gap-2 px-3 py-2">
-            <span className="w-2 h-2 rounded-full bg-accent pulse-live" />
-            <span className="text-xs text-muted">Scraper activo</span>
+          <div className="flex items-center justify-between px-3 py-2">
+            <div className="flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-accent pulse-live" />
+              <span className="text-xs text-muted">Scraper activo</span>
+            </div>
+            <button
+              onClick={() => setAlertsEnabled(!alertsEnabled)}
+              title={alertsEnabled ? "Alertas activadas" : "Alertas desactivadas"}
+              className={`w-7 h-7 flex items-center justify-center rounded-lg transition-colors ${
+                alertsEnabled
+                  ? "text-accent hover:bg-accent/10"
+                  : "text-muted/40 hover:text-muted hover:bg-surface-2"
+              }`}
+            >
+              {alertsEnabled ? <Bell className="w-3.5 h-3.5" /> : <BellOff className="w-3.5 h-3.5" />}
+            </button>
           </div>
-          <div className="px-3 mt-1">
+          <div className="px-3 mt-1 flex items-center justify-between">
             <span
               className="text-[10px] text-muted/60 font-mono"
               style={{ fontFamily: "var(--font-mono)" }}
             >
               v0.1.0 — Uruguay
             </span>
+            <ThemeToggle />
           </div>
         </div>
       </aside>
