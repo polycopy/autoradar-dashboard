@@ -88,7 +88,7 @@ export default async function ListingDetailPage({
   ].filter((s) => s.value);
 
   return (
-    <div className="max-w-5xl space-y-8">
+    <div className="max-w-5xl mx-auto space-y-8">
       {/* Back */}
       <Link
         href="/"
@@ -102,7 +102,7 @@ export default async function ListingDetailPage({
       <div className="bg-surface border border-border-subtle rounded-xl overflow-hidden">
         <div className="grid grid-cols-1 lg:grid-cols-2">
           {/* Image */}
-          <div className="relative aspect-[4/3] lg:aspect-auto bg-surface-2">
+          <div className="relative aspect-[4/3] bg-surface-2 lg:min-h-[400px]">
             {hasImage ? (
               <Image
                 src={listing.primary_image_url!}
