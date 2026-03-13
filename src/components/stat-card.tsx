@@ -14,28 +14,40 @@ export function StatCard({
   accent?: boolean;
 }) {
   return (
-    <div className="bg-surface border border-border-subtle rounded-xl p-5 relative overflow-hidden group hover:border-border transition-colors">
-      <div className="flex items-start justify-between">
+    <div
+      className={`relative overflow-hidden rounded-xl p-5 transition-all duration-300 ${
+        accent
+          ? "bg-gradient-to-br from-accent/10 via-surface to-surface border border-accent/20 card-glow"
+          : "bg-surface border border-border-subtle hover:border-border"
+      }`}
+    >
+      <div className="flex items-start justify-between relative z-10">
         <div>
-          <p className="text-xs uppercase tracking-wider text-muted font-medium mb-2">
+          <p className="text-[11px] uppercase tracking-widest text-muted font-medium mb-2.5">
             {label}
           </p>
           <p
-            className={`text-2xl font-bold tracking-tight ${accent ? "text-accent" : "text-foreground"}`}
+            className={`text-3xl font-bold tracking-tight ${accent ? "text-accent" : "text-foreground"}`}
             style={{ fontFamily: "var(--font-display)" }}
           >
             {value}
           </p>
-          {sub && <p className="text-xs text-muted mt-1">{sub}</p>}
+          {sub && <p className="text-xs text-muted mt-1.5">{sub}</p>}
         </div>
         {Icon && (
-          <div className="w-9 h-9 rounded-lg bg-surface-2 border border-border-subtle flex items-center justify-center">
-            <Icon className="w-4 h-4 text-muted" />
+          <div
+            className={`w-10 h-10 rounded-xl flex items-center justify-center ${
+              accent
+                ? "bg-accent/10 border border-accent/20"
+                : "bg-surface-2 border border-border-subtle"
+            }`}
+          >
+            <Icon className={`w-[18px] h-[18px] ${accent ? "text-accent" : "text-muted"}`} />
           </div>
         )}
       </div>
       {accent && (
-        <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-accent/40 to-transparent" />
+        <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-accent/50 to-transparent" />
       )}
     </div>
   );

@@ -61,7 +61,7 @@ export function Sidebar() {
 
       {/* Sidebar */}
       <aside
-        className={`fixed top-0 bottom-0 w-64 bg-surface border-r border-border-subtle flex flex-col z-50 transition-transform duration-300 ${
+        className={`fixed top-0 bottom-0 w-64 bg-surface-2/80 backdrop-blur-xl border-r border-border-subtle flex flex-col z-50 transition-transform duration-300 ${
           open ? "translate-x-0" : "-translate-x-full"
         } lg:translate-x-0`}
       >

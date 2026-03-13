@@ -24,7 +24,7 @@ export function ListingCard({
   return (
     <Link
       href={`/listing/${encodeURIComponent(listing.fb_listing_id)}`}
-      className="group bg-surface border border-border-subtle rounded-xl overflow-hidden hover:border-accent/30 transition-all duration-300 flex flex-col"
+      className="group bg-surface border border-border-subtle rounded-xl overflow-hidden card-glow flex flex-col"
     >
       {/* Imagen */}
       <div className="relative aspect-[16/10] bg-surface-2 overflow-hidden">
@@ -88,7 +88,7 @@ export function ListingCard({
       </div>
 
       {/* Contenido */}
-      <div className="p-4 flex-1 flex flex-col">
+      <div className="p-4 sm:p-5 flex-1 flex flex-col">
         <div className="flex items-start justify-between gap-2 mb-2">
           <h3 className="text-sm font-semibold text-foreground leading-tight line-clamp-2">
             {listing.make_normalized && listing.model_normalized

@@ -39,8 +39,10 @@ export default function RootLayout({
       >
         <div className="flex min-h-screen">
           <Sidebar />
-          <main className="flex-1 lg:ml-64 pt-14 lg:pt-0 p-4 sm:p-6 lg:p-8">
-            {children}
+          <main className="flex-1 lg:ml-64 pt-16 lg:pt-0">
+            <div className="mx-auto max-w-7xl px-5 sm:px-8 lg:px-10 py-6 sm:py-8 lg:py-10">
+              {children}
+            </div>
           </main>
         </div>
       </body>

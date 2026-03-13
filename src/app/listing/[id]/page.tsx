@@ -81,7 +81,7 @@ export default async function ListingDetailPage({
   ].filter((s) => s.value);
 
   return (
-    <div className="max-w-5xl space-y-6">
+    <div className="max-w-5xl space-y-8">
       {/* Back */}
       <Link
         href="/"
