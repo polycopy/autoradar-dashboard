@@ -25,7 +25,7 @@ import {
   getSimilarListings,
   getAvgDaysToSell,
 } from "@/lib/queries";
-import { formatUSD, formatKm, timeAgo, gradeColor, discountToGrade } from "@/lib/utils";
+import { formatUSD, formatKm, timeAgo, discountToGrade } from "@/lib/utils";
 import { ListingCard } from "@/components/listing-card";
 import { FavoriteButton } from "@/components/favorite-button";
 import { ProfitEstimator } from "@/components/profit-estimator";
@@ -120,17 +120,23 @@ export default async function ListingDetailPage({
             )}
 
             {/* Badges */}
-            <div className="absolute top-4 left-4 flex gap-2">
+            <div className="absolute top-4 left-4 flex flex-wrap gap-2">
               {grade !== "D" && (
                 <span
-                  className={`px-3 py-1.5 rounded-lg text-sm font-bold border ${gradeColor(grade)}`}
+                  className={`px-3 py-1.5 rounded-lg text-sm font-bold backdrop-blur-md shadow-sm ${
+                    grade === "A"
+                      ? "bg-emerald-600/90 text-white border border-emerald-400/30"
+                      : grade === "B"
+                        ? "bg-amber-600/90 text-white border border-amber-400/30"
+                        : "bg-zinc-600/90 text-white border border-zinc-400/30"
+                  }`}
                 >
                   Grado {grade}
                 </span>
               )}
               {discount > 0 && (
-                <span className="px-3 py-1.5 rounded-lg text-sm font-bold bg-accent/90 text-white dark:text-black">
-                  -{Math.round(discount)}% bajo mercado
+                <span className="px-3 py-1.5 rounded-lg text-sm font-bold bg-black/70 text-white backdrop-blur-md shadow-sm">
+                  -{Math.round(discount)}%
                 </span>
               )}
             </div>
@@ -138,10 +144,10 @@ export default async function ListingDetailPage({
             {/* Source */}
             <div className="absolute top-4 right-4">
               <span
-                className={`px-3 py-1.5 rounded-lg text-xs font-medium backdrop-blur-sm ${
+                className={`px-3 py-1.5 rounded-lg text-xs font-semibold backdrop-blur-md shadow-sm ${
                   source === "mercadolibre"
-                    ? "bg-yellow-500/20 text-yellow-700 border border-yellow-500/30 dark:text-yellow-300 dark:border-yellow-500/20"
-                    : "bg-blue-500/20 text-blue-700 border border-blue-500/30 dark:text-blue-300 dark:border-blue-500/20"
+                    ? "bg-yellow-500/80 text-white border border-yellow-400/30"
+                    : "bg-blue-500/80 text-white border border-blue-400/30"
                 }`}
               >
                 {source === "mercadolibre" ? "MercadoLibre" : "Facebook"}
@@ -229,19 +235,22 @@ export default async function ListingDetailPage({
               )}
 
               {discount > 0 && (
-                <div className="mt-4">
-                  <DealScore discount={discount} grade={grade} />
+                <div className="mt-3 flex items-center justify-between">
+                  <span className="text-[10px] uppercase tracking-wider text-muted font-medium">
+                    Deal Score
+                  </span>
+                  <DealScore discount={discount} grade={grade} compact />
                 </div>
               )}
             </div>
 
             {/* Specs */}
             {specs.length > 0 && (
-              <div className="mt-6 grid grid-cols-2 sm:grid-cols-3 gap-3">
+              <div className="mt-6 flex flex-wrap gap-3">
                 {specs.map((s) => (
                   <div
                     key={s.label}
-                    className="flex items-center gap-2 px-3 py-2 bg-surface-2 rounded-lg border border-border-subtle"
+                    className="flex items-center gap-2 px-3 py-2 bg-surface-2 rounded-lg border border-border-subtle min-w-[140px]"
                   >
                     <s.icon className="w-4 h-4 text-muted flex-shrink-0" />
                     <div className="min-w-0">
