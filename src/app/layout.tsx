@@ -3,6 +3,8 @@ import { DM_Sans, JetBrains_Mono, Outfit } from "next/font/google";
 import "./globals.css";
 import { Sidebar } from "@/components/sidebar";
 import { AlertProvider } from "@/components/alert-provider";
+import { CompareProvider } from "@/lib/compare";
+import { CompareBar } from "@/components/compare-bar";
 
 const dmSans = DM_Sans({
   variable: "--font-dm-sans",
@@ -45,16 +47,19 @@ export default function RootLayout({
       <body
         className={`${dmSans.variable} ${jetbrainsMono.variable} ${outfit.variable} antialiased scanline`}
       >
-        <AlertProvider>
-          <div className="flex min-h-screen">
-            <Sidebar />
-            <main className="flex-1 lg:ml-64 pt-16 lg:pt-0">
-              <div className="mx-auto max-w-7xl px-5 sm:px-8 lg:px-10 py-6 sm:py-8 lg:py-10">
-                {children}
-              </div>
-            </main>
-          </div>
-        </AlertProvider>
+        <CompareProvider>
+          <AlertProvider>
+            <div className="flex min-h-screen">
+              <Sidebar />
+              <main className="flex-1 lg:ml-64 pt-16 lg:pt-0">
+                <div className="mx-auto max-w-7xl px-5 sm:px-8 lg:px-10 py-6 sm:py-8 lg:py-10">
+                  {children}
+                </div>
+              </main>
+            </div>
+            <CompareBar />
+          </AlertProvider>
+        </CompareProvider>
       </body>
     </html>
   );

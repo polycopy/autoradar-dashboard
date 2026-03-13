@@ -5,6 +5,7 @@ import Link from "next/link";
 import { MapPin, Clock, Gauge, ChevronDown, Car } from "lucide-react";
 import { formatUSD, formatKm, timeAgo, gradeColor } from "@/lib/utils";
 import { FavoriteButton } from "@/components/favorite-button";
+import { CompareToggle } from "@/components/compare-toggle";
 import type { Listing } from "@/lib/supabase";
 
 export function ListingCard({
@@ -12,11 +13,13 @@ export function ListingCard({
   discount,
   median,
   grade,
+  showSoldBadge,
 }: {
   listing: Listing;
   discount: number;
   median: number;
   grade: string;
+  showSoldBadge?: boolean;
 }) {
   const hasImage =
     listing.primary_image_url &&
@@ -44,6 +47,25 @@ export function ListingCard({
           <div className="absolute inset-0 flex items-center justify-center text-muted">
             <Car className="w-12 h-12 opacity-20" />
           </div>
+        )}
+
+        {/* Sold overlay */}
+        {showSoldBadge && (
+          <>
+            <div className="absolute inset-0 bg-black/30 z-10" />
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20">
+              <span className="px-3 py-1.5 rounded-lg text-sm font-bold bg-danger/90 text-white">
+                VENDIDO
+              </span>
+            </div>
+            {listing.days_listed != null && listing.days_listed > 0 && (
+              <div className="absolute top-3 right-3 z-20">
+                <span className="px-2 py-1 rounded-md text-xs font-medium bg-black/60 text-white backdrop-blur-sm">
+                  {listing.days_listed}d en venta
+                </span>
+              </div>
+            )}
+          </>
         )}
 
         {/* Grade badge */}
@@ -101,7 +123,10 @@ export function ListingCard({
               <span className="text-muted ml-1">{listing.vehicle_year}</span>
             )}
           </h3>
-          <FavoriteButton listingId={listing.fb_listing_id} price={Number(listing.price_amount ?? 0)} />
+          <div className="flex items-center gap-1 flex-shrink-0">
+            <CompareToggle listingId={listing.fb_listing_id} />
+            <FavoriteButton listingId={listing.fb_listing_id} price={Number(listing.price_amount ?? 0)} />
+          </div>
         </div>
 
         {/* Precio */}

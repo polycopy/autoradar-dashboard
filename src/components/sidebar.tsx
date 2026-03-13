@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Radar, TrendingUp, Calculator, Car, Menu, X, Heart, Bell, BellOff } from "lucide-react";
+import { Radar, TrendingUp, Calculator, Car, Menu, X, Heart, Bell, BellOff, Archive, Scale } from "lucide-react";
 import { useState, useEffect } from "react";
 import { GlobalSearch } from "./global-search";
 import { ThemeToggle } from "./theme-toggle";
@@ -11,6 +11,8 @@ import { useAlerts } from "./alert-provider";
 const nav = [
   { href: "/", label: "Oportunidades", icon: Radar },
   { href: "/favorites", label: "Favoritos", icon: Heart },
+  { href: "/compare", label: "Comparador", icon: Scale },
+  { href: "/sold", label: "Vendidos", icon: Archive },
   { href: "/market", label: "Mercado", icon: TrendingUp },
   { href: "/valuator", label: "Valuador", icon: Calculator },
 ];

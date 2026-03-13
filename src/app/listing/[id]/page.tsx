@@ -26,6 +26,7 @@ import {
 import { formatUSD, formatKm, timeAgo, gradeColor, discountToGrade } from "@/lib/utils";
 import { ListingCard } from "@/components/listing-card";
 import { FavoriteButton } from "@/components/favorite-button";
+import { ProfitEstimator } from "@/components/profit-estimator";
 
 export const dynamic = "force-dynamic";
 
@@ -289,6 +290,15 @@ export default async function ListingDetailPage({
           </div>
         </div>
       </div>
+
+      {/* Profit estimator */}
+      {ref && price > 0 && (
+        <ProfitEstimator
+          buyPrice={price}
+          marketMedian={ref.median}
+          grade={grade}
+        />
+      )}
 
       {/* Description */}
       {listing.description && (

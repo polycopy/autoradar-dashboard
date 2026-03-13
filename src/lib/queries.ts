@@ -291,3 +291,99 @@ export async function getPriceDistribution(
     .map(([price, count]) => ({ price, count }))
     .sort((a, b) => a.price - b.price);
 }
+
+export async function getSoldListings(filters?: {
+  limit?: number;
+  makes?: string[];
+  minPrice?: number;
+  maxPrice?: number;
+}): Promise<Listing[]> {
+  const lim = filters?.limit ?? 200;
+  const minP = filters?.minPrice ?? 500;
+  const maxP = filters?.maxPrice ?? 100000;
+
+  if (filters?.makes && filters.makes.length > 0) {
+    return sql<Listing[]>`
+      SELECT * FROM listings
+      WHERE vehicle_type = 'car'
+        AND status IN ('sold', 'unlive')
+        AND make_normalized IS NOT NULL
+        AND price_amount IS NOT NULL
+        AND price_amount > ${minP}
+        AND price_amount < ${maxP}
+        AND make_normalized = ANY(${filters.makes})
+      ORDER BY last_seen_at DESC
+      LIMIT ${lim}
+    `;
+  }
+
+  return sql<Listing[]>`
+    SELECT * FROM listings
+    WHERE vehicle_type = 'car'
+      AND status IN ('sold', 'unlive')
+      AND make_normalized IS NOT NULL
+      AND price_amount IS NOT NULL
+      AND price_amount > ${minP}
+      AND price_amount < ${maxP}
+    ORDER BY last_seen_at DESC
+    LIMIT ${lim}
+  `;
+}
+
+export async function getSoldStats() {
+  const rows = await sql`
+    SELECT
+      count(*) as total_sold,
+      round(avg(days_listed))::int as avg_days,
+      round(avg(price_amount))::int as avg_price,
+      round(percentile_cont(0.5) WITHIN GROUP (ORDER BY days_listed))::int as median_days
+    FROM listings
+    WHERE vehicle_type = 'car'
+      AND status IN ('sold', 'unlive')
+      AND days_listed IS NOT NULL
+      AND days_listed > 0
+      AND price_amount IS NOT NULL
+      AND price_amount > 500
+  `;
+  const r = rows[0];
+  return {
+    total_sold: Number(r.total_sold ?? 0),
+    avg_days: Number(r.avg_days ?? 0),
+    avg_price: Number(r.avg_price ?? 0),
+    median_days: Number(r.median_days ?? 0),
+  };
+}
+
+export async function getRotationByModel(limit = 20): Promise<{
+  vehicle: string;
+  make: string;
+  model: string;
+  total: number;
+  sold: number;
+  sell_rate: number;
+  avg_days: number;
+  avg_price: number;
+}[]> {
+  const rows = await sql`
+    SELECT
+      make_normalized || ' ' || model_normalized as vehicle,
+      make_normalized as make,
+      model_normalized as model,
+      count(*) as total,
+      count(*) FILTER (WHERE status IN ('sold', 'unlive')) as sold,
+      round(100.0 * count(*) FILTER (WHERE status IN ('sold', 'unlive')) / count(*))::int as sell_rate,
+      round(avg(days_listed) FILTER (WHERE status IN ('sold', 'unlive') AND days_listed > 0))::int as avg_days,
+      round(avg(price_amount) FILTER (WHERE status IN ('sold', 'unlive')))::int as avg_price
+    FROM listings
+    WHERE vehicle_type = 'car'
+      AND make_normalized IS NOT NULL
+      AND model_normalized IS NOT NULL
+      AND price_amount IS NOT NULL
+      AND price_amount > 500
+    GROUP BY make_normalized, model_normalized
+    HAVING count(*) >= 3 AND count(*) FILTER (WHERE status IN ('sold', 'unlive')) >= 1
+    ORDER BY sell_rate DESC, sold DESC
+    LIMIT ${limit}
+  `;
+  return rows as unknown as any[];
+}
