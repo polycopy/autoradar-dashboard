@@ -1,14 +1,22 @@
 import { TrendingUp, BarChart3, Clock, DollarSign } from "lucide-react";
 import { StatCard } from "@/components/stat-card";
-import { getMarketStats, getTopRotation } from "@/lib/queries";
+import {
+  getMarketStats,
+  getTopRotation,
+  getMakeDistribution,
+  getPriceSegmentDistribution,
+} from "@/lib/queries";
 import { formatUSD } from "@/lib/utils";
+import { MakeDistributionChart, PriceSegmentChart } from "@/components/market-charts";
 
 export const dynamic = "force-dynamic";
 
 export default async function MarketPage() {
-  const [stats, rotation] = await Promise.all([
+  const [stats, rotation, makesDist, segmentsDist] = await Promise.all([
     getMarketStats(),
     getTopRotation(30),
+    getMakeDistribution(),
+    getPriceSegmentDistribution(),
   ]);
 
   return (
@@ -49,6 +57,12 @@ export default async function MarketPage() {
           value={stats.dealers.toLocaleString()}
           icon={DollarSign}
         />
+      </div>
+
+      {/* Charts */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <MakeDistributionChart data={makesDist} />
+        <PriceSegmentChart data={segmentsDist} />
       </div>
 
       {/* Tabla de rotación */}

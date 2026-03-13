@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useMemo } from "react";
-import { Radar, SlidersHorizontal, X } from "lucide-react";
+import { useState, useMemo, useEffect, useCallback } from "react";
+import { useRouter } from "next/navigation";
+import { Radar, SlidersHorizontal, X, RefreshCw } from "lucide-react";
 import { ListingCard } from "./listing-card";
 import type { Listing } from "@/lib/supabase";
 
@@ -21,12 +22,32 @@ export function OpportunitiesView({
   makes: string[];
   cities: string[];
 }) {
+  const router = useRouter();
   const [gradeFilter, setGradeFilter] = useState<"all" | "A" | "B" | "C">("all");
   const [selectedMakes, setSelectedMakes] = useState<string[]>([]);
   const [priceMin, setPriceMin] = useState("");
   const [priceMax, setPriceMax] = useState("");
   const [selectedCity, setSelectedCity] = useState("");
   const [showFilters, setShowFilters] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
+  const [lastRefresh, setLastRefresh] = useState(new Date());
+
+  const handleRefresh = useCallback(() => {
+    setRefreshing(true);
+    router.refresh();
+    setTimeout(() => {
+      setRefreshing(false);
+      setLastRefresh(new Date());
+    }, 1500);
+  }, [router]);
+
+  // Auto-refresh every 5 minutes
+  useEffect(() => {
+    const interval = setInterval(() => {
+      handleRefresh();
+    }, 5 * 60 * 1000);
+    return () => clearInterval(interval);
+  }, [handleRefresh]);
 
   const filtered = useMemo(() => {
     return listings.filter((l) => {
@@ -85,8 +106,20 @@ export function OpportunitiesView({
         })}
 
         <button
+          onClick={handleRefresh}
+          disabled={refreshing}
+          className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium border bg-surface text-muted border-border-subtle hover:border-border hover:text-foreground transition-colors disabled:opacity-50"
+          title={`Última actualización: ${lastRefresh.toLocaleTimeString("es-UY")}`}
+        >
+          <RefreshCw className={`w-4 h-4 ${refreshing ? "animate-spin" : ""}`} />
+          <span className="hidden sm:inline text-xs">
+            {lastRefresh.toLocaleTimeString("es-UY", { hour: "2-digit", minute: "2-digit" })}
+          </span>
+        </button>
+
+        <button
           onClick={() => setShowFilters(!showFilters)}
-          className={`ml-auto flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium border transition-colors ${
+          className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium border transition-colors ${
             showFilters || hasActiveFilters
               ? "bg-accent/10 text-accent border-accent/20"
               : "bg-surface text-muted border-border-subtle hover:border-border hover:text-foreground"

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Radar, TrendingUp, Calculator, Car, Menu, X } from "lucide-react";
 import { useState, useEffect } from "react";
+import { GlobalSearch } from "./global-search";
 
 const nav = [
   { href: "/", label: "Oportunidades", icon: Radar },
@@ -82,6 +83,11 @@ export function Sidebar() {
               </p>
             </div>
           </Link>
+        </div>
+
+        {/* Search */}
+        <div className="px-4 pt-4 pb-2">
+          <GlobalSearch />
         </div>
 
         {/* Nav */}

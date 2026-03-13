@@ -78,6 +78,66 @@ export async function getUniqueMakes(): Promise<string[]> {
   return rows.map((r) => r.make_normalized);
 }
 
+export async function getModelsForMake(make: string): Promise<string[]> {
+  const rows = await sql`
+    SELECT DISTINCT model_normalized
+    FROM listings
+    WHERE vehicle_type = 'car'
+      AND status = 'live'
+      AND make_normalized = ${make}
+      AND model_normalized IS NOT NULL
+    ORDER BY model_normalized
+  `;
+  return rows.map((r) => r.model_normalized);
+}
+
+export async function searchListings(query: string, limit = 30): Promise<Listing[]> {
+  const pattern = `%${query}%`;
+  return sql<Listing[]>`
+    SELECT * FROM listings
+    WHERE vehicle_type = 'car'
+      AND status = 'live'
+      AND (
+        title ILIKE ${pattern}
+        OR make_normalized ILIKE ${pattern}
+        OR model_normalized ILIKE ${pattern}
+      )
+    ORDER BY first_seen_at DESC
+    LIMIT ${limit}
+  `;
+}
+
+export async function getMakeDistribution(): Promise<{ make: string; count: number }[]> {
+  const rows = await sql`
+    SELECT make_normalized as make, count(*)::int as count
+    FROM listings
+    WHERE vehicle_type = 'car'
+      AND status = 'live'
+      AND make_normalized IS NOT NULL
+    GROUP BY make_normalized
+    ORDER BY count DESC
+    LIMIT 15
+  `;
+  return rows as unknown as { make: string; count: number }[];
+}
+
+export async function getPriceSegmentDistribution(): Promise<{ segment: string; count: number; avg_price: number }[]> {
+  const rows = await sql`
+    SELECT
+      price_segment as segment,
+      count(*)::int as count,
+      round(avg(price_amount))::int as avg_price
+    FROM listings
+    WHERE vehicle_type = 'car'
+      AND status = 'live'
+      AND price_segment IS NOT NULL
+      AND price_amount IS NOT NULL
+    GROUP BY price_segment
+    ORDER BY avg_price ASC
+  `;
+  return rows as unknown as { segment: string; count: number; avg_price: number }[];
+}
+
 export async function getUniqueCities(): Promise<string[]> {
   const rows = await sql`
     SELECT DISTINCT location_city

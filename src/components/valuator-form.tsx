@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Calculator, Search, TrendingDown, TrendingUp, Minus } from "lucide-react";
 import { formatUSD } from "@/lib/utils";
 
@@ -23,6 +23,23 @@ export function ValuatorForm({ makes }: { makes: string[] }) {
   >([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [models, setModels] = useState<string[]>([]);
+  const [loadingModels, setLoadingModels] = useState(false);
+
+  useEffect(() => {
+    if (!make) {
+      setModels([]);
+      setModel("");
+      return;
+    }
+    setLoadingModels(true);
+    setModel("");
+    fetch(`/api/models?make=${encodeURIComponent(make)}`)
+      .then((r) => r.json())
+      .then((d) => setModels(d.models ?? []))
+      .catch(() => setModels([]))
+      .finally(() => setLoadingModels(false));
+  }, [make]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -91,13 +108,25 @@ export function ValuatorForm({ makes }: { makes: string[] }) {
             <label className="block text-xs uppercase tracking-wider text-muted font-medium mb-2">
               Modelo
             </label>
-            <input
-              type="text"
+            <select
               value={model}
               onChange={(e) => setModel(e.target.value)}
-              placeholder="ej. Corolla, Gol, Onix"
-              className="w-full px-4 py-2.5 rounded-lg bg-surface-2 border border-border-subtle text-foreground text-sm placeholder:text-muted/40 focus:outline-none focus:border-accent/50 transition-colors"
-            />
+              disabled={!make || loadingModels}
+              className="w-full px-4 py-2.5 rounded-lg bg-surface-2 border border-border-subtle text-foreground text-sm focus:outline-none focus:border-accent/50 transition-colors disabled:opacity-50"
+            >
+              <option value="">
+                {!make
+                  ? "Seleccioná marca primero"
+                  : loadingModels
+                    ? "Cargando..."
+                    : "Seleccioná modelo..."}
+              </option>
+              {models.map((m) => (
+                <option key={m} value={m}>
+                  {m}
+                </option>
+              ))}
+            </select>
           </div>
 
           <div>
