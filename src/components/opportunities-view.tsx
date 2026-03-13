@@ -12,6 +12,7 @@ export type ScoredListing = Listing & {
   market_median: number;
   grade: string;
   margin_usd: number;
+  avg_days_to_sell: number | null;
 };
 
 export function OpportunitiesView({
@@ -326,6 +327,7 @@ export function OpportunitiesView({
               discount={listing.discount_pct}
               median={listing.market_median}
               grade={listing.grade}
+              avgDaysToSell={listing.avg_days_to_sell}
             />
           ))}
         </div>

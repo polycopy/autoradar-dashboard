@@ -292,6 +292,30 @@ export async function getPriceDistribution(
     .sort((a, b) => a.price - b.price);
 }
 
+export async function getAvgDaysToSell(): Promise<Map<string, number>> {
+  const rows = await sql`
+    SELECT
+      make_normalized,
+      model_normalized,
+      round(avg(days_listed))::int as avg_days
+    FROM listings
+    WHERE vehicle_type = 'car'
+      AND status IN ('sold', 'unlive')
+      AND days_listed IS NOT NULL
+      AND days_listed > 0
+      AND days_listed < 180
+      AND make_normalized IS NOT NULL
+      AND model_normalized IS NOT NULL
+    GROUP BY make_normalized, model_normalized
+    HAVING count(*) >= 2
+  `;
+  const map = new Map<string, number>();
+  for (const r of rows) {
+    map.set(`${r.make_normalized}|${r.model_normalized}`, Number(r.avg_days));
+  }
+  return map;
+}
+
 export async function getSoldListings(filters?: {
   limit?: number;
   makes?: string[];
@@ -386,4 +410,96 @@ export async function getRotationByModel(limit = 20): Promise<{
     LIMIT ${limit}
   `;
   return rows as unknown as any[];
+}
+
+export async function getDemandSupply(limit = 25): Promise<{
+  vehicle: string;
+  make: string;
+  model: string;
+  live: number;
+  sold: number;
+  total: number;
+  sell_rate: number;
+  avg_days: number | null;
+  demand_score: number;
+}[]> {
+  const rows = await sql`
+    SELECT
+      make_normalized || ' ' || model_normalized as vehicle,
+      make_normalized as make,
+      model_normalized as model,
+      count(*) FILTER (WHERE status = 'live') as live,
+      count(*) FILTER (WHERE status IN ('sold', 'unlive')) as sold,
+      count(*) as total,
+      round(100.0 * count(*) FILTER (WHERE status IN ('sold', 'unlive')) / NULLIF(count(*), 0))::int as sell_rate,
+      round(avg(days_listed) FILTER (WHERE status IN ('sold', 'unlive') AND days_listed > 0 AND days_listed < 180))::int as avg_days
+    FROM listings
+    WHERE vehicle_type = 'car'
+      AND make_normalized IS NOT NULL
+      AND model_normalized IS NOT NULL
+      AND price_amount IS NOT NULL
+      AND price_amount > 500
+    GROUP BY make_normalized, model_normalized
+    HAVING count(*) >= 5
+    ORDER BY sell_rate DESC, sold DESC
+    LIMIT ${limit}
+  `;
+  return (rows as unknown as any[]).map(r => ({
+    ...r,
+    live: Number(r.live),
+    sold: Number(r.sold),
+    total: Number(r.total),
+    sell_rate: Number(r.sell_rate ?? 0),
+    avg_days: r.avg_days ? Number(r.avg_days) : null,
+    // Demand score: high sell_rate + low avg_days = high demand
+    demand_score: Math.min(100, Math.round(
+      (Number(r.sell_rate ?? 0) * 0.7) +
+      (r.avg_days ? Math.max(0, (60 - Number(r.avg_days))) * 0.5 : 0)
+    )),
+  }));
+}
+
+export async function getPriceTrend(
+  make: string,
+  model: string,
+): Promise<{ date: string; median: number; count: number }[]> {
+  const rows = await sql`
+    SELECT
+      date_trunc('week', first_seen_at)::date as week,
+      round(percentile_cont(0.5) WITHIN GROUP (ORDER BY price_amount))::int as median,
+      count(*)::int as count
+    FROM listings
+    WHERE vehicle_type = 'car'
+      AND make_normalized = ${make}
+      AND model_normalized = ${model}
+      AND price_amount IS NOT NULL
+      AND price_amount > 500
+      AND first_seen_at > now() - interval '6 months'
+    GROUP BY date_trunc('week', first_seen_at)
+    HAVING count(*) >= 2
+    ORDER BY week ASC
+  `;
+  return rows.map(r => ({
+    date: String(r.week),
+    median: Number(r.median),
+    count: Number(r.count),
+  }));
+}
+
+export async function getTopModelsForTrend(limit = 10): Promise<{ make: string; model: string; count: number }[]> {
+  const rows = await sql`
+    SELECT make_normalized as make, model_normalized as model, count(*)::int as count
+    FROM listings
+    WHERE vehicle_type = 'car'
+      AND status = 'live'
+      AND make_normalized IS NOT NULL
+      AND model_normalized IS NOT NULL
+      AND price_amount IS NOT NULL
+      AND price_amount > 500
+    GROUP BY make_normalized, model_normalized
+    HAVING count(*) >= 5
+    ORDER BY count DESC
+    LIMIT ${limit}
+  `;
+  return rows as unknown as { make: string; model: string; count: number }[];
 }

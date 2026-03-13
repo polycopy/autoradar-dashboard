@@ -2,10 +2,11 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { MapPin, Clock, Gauge, ChevronDown, Car } from "lucide-react";
+import { MapPin, Clock, Gauge, ChevronDown, Car, Timer } from "lucide-react";
 import { formatUSD, formatKm, timeAgo, gradeColor } from "@/lib/utils";
 import { FavoriteButton } from "@/components/favorite-button";
 import { CompareToggle } from "@/components/compare-toggle";
+import { DealScore } from "@/components/deal-score";
 import type { Listing } from "@/lib/supabase";
 
 export function ListingCard({
@@ -14,12 +15,14 @@ export function ListingCard({
   median,
   grade,
   showSoldBadge,
+  avgDaysToSell,
 }: {
   listing: Listing;
   discount: number;
   median: number;
   grade: string;
   showSoldBadge?: boolean;
+  avgDaysToSell?: number | null;
 }) {
   const hasImage =
     listing.primary_image_url &&
@@ -146,6 +149,13 @@ export function ListingCard({
           )}
         </div>
 
+        {/* Deal Score */}
+        {discount > 0 && (
+          <div className="mb-3">
+            <DealScore discount={discount} grade={grade} compact />
+          </div>
+        )}
+
         {/* Meta */}
         <div className="flex flex-wrap gap-1.5 mt-auto">
           {listing.location_city && (
@@ -165,6 +175,12 @@ export function ListingCard({
             <Clock className="w-3 h-3" />
             {timeAgo(listing.first_seen_at)}
           </span>
+          {avgDaysToSell != null && (
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-surface-2 text-[11px] text-muted">
+              <Timer className="w-3 h-3" />
+              ~{avgDaysToSell}d venta
+            </span>
+          )}
           {listing.is_dealer && (
             <span className="inline-flex items-center px-2 py-0.5 rounded bg-amber-500/10 text-[11px] text-amber-700 dark:text-amber-400 border border-amber-500/20">
               Dealer

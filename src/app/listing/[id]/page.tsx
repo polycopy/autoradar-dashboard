@@ -16,17 +16,20 @@ import {
   TrendingDown,
   TrendingUp,
   Minus,
+  Timer,
 } from "lucide-react";
 import {
   getListingById,
   getPriceHistory,
   getMarketMedians,
   getSimilarListings,
+  getAvgDaysToSell,
 } from "@/lib/queries";
 import { formatUSD, formatKm, timeAgo, gradeColor, discountToGrade } from "@/lib/utils";
 import { ListingCard } from "@/components/listing-card";
 import { FavoriteButton } from "@/components/favorite-button";
 import { ProfitEstimator } from "@/components/profit-estimator";
+import { DealScore } from "@/components/deal-score";
 
 export const dynamic = "force-dynamic";
 
@@ -39,7 +42,7 @@ export default async function ListingDetailPage({
   const listing = await getListingById(decodeURIComponent(id));
   if (!listing) notFound();
 
-  const [priceHistory, medians, similar] = await Promise.all([
+  const [priceHistory, medians, similar, avgDays] = await Promise.all([
     getPriceHistory(listing.id),
     getMarketMedians(),
     listing.make_normalized && listing.model_normalized
@@ -49,6 +52,7 @@ export default async function ListingDetailPage({
           listing.fb_listing_id,
         )
       : Promise.resolve([]),
+    getAvgDaysToSell(),
   ]);
 
   // Market data
@@ -58,6 +62,7 @@ export default async function ListingDetailPage({
   const discount = ref ? ((ref.median - price) / ref.median) * 100 : 0;
   const margin = ref ? ref.median - price - 400 : 0;
   const grade = ref ? discountToGrade(discount, margin) : "D";
+  const avgDaysToSell = avgDays.get(key) ?? null;
 
   const source =
     listing.source ??
@@ -222,6 +227,12 @@ export default async function ListingDetailPage({
                   </div>
                 </div>
               )}
+
+              {discount > 0 && (
+                <div className="mt-4">
+                  <DealScore discount={discount} grade={grade} />
+                </div>
+              )}
             </div>
 
             {/* Specs */}
@@ -263,6 +274,12 @@ export default async function ListingDetailPage({
                 <span className="inline-flex items-center gap-1">
                   <Eye className="w-3 h-3" />
                   {listing.times_seen} veces detectado
+                </span>
+              )}
+              {avgDaysToSell != null && (
+                <span className="inline-flex items-center gap-1">
+                  <Timer className="w-3 h-3" />
+                  Se vende en ~{avgDaysToSell} días
                 </span>
               )}
               {listing.seller_name && (

@@ -5,18 +5,24 @@ import {
   getTopRotation,
   getMakeDistribution,
   getPriceSegmentDistribution,
+  getDemandSupply,
+  getTopModelsForTrend,
 } from "@/lib/queries";
 import { formatUSD } from "@/lib/utils";
 import { MakeDistributionChart, PriceSegmentChart } from "@/components/market-charts";
+import { DemandSupplyChart } from "@/components/demand-supply-chart";
+import { PriceTrendChart } from "@/components/price-trend-chart";
 
 export const dynamic = "force-dynamic";
 
 export default async function MarketPage() {
-  const [stats, rotation, makesDist, segmentsDist] = await Promise.all([
+  const [stats, rotation, makesDist, segmentsDist, demandSupply, topModels] = await Promise.all([
     getMarketStats(),
     getTopRotation(30),
     getMakeDistribution(),
     getPriceSegmentDistribution(),
+    getDemandSupply(20),
+    getTopModelsForTrend(15),
   ]);
 
   return (
@@ -64,6 +70,12 @@ export default async function MarketPage() {
         <MakeDistributionChart data={makesDist} />
         <PriceSegmentChart data={segmentsDist} />
       </div>
+
+      {/* Demanda vs Oferta */}
+      <DemandSupplyChart data={demandSupply} />
+
+      {/* Tendencia de Precios por Modelo */}
+      <PriceTrendChart topModels={topModels} />
 
       {/* Tabla de rotación */}
       <div className="bg-surface border border-border-subtle rounded-xl overflow-hidden">

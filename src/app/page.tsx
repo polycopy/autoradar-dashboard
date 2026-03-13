@@ -10,24 +10,27 @@ import {
   getMarketMedians,
   getUniqueMakes,
   getUniqueCities,
+  getAvgDaysToSell,
 } from "@/lib/queries";
 import { discountToGrade } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
 
 export default async function OpportunitiesPage() {
-  const [raw, stats, medians, makes, cities] = await Promise.all([
+  const [raw, stats, medians, makes, cities, avgDays] = await Promise.all([
     getOpportunities({ limit: 500 }),
     getMarketStats(),
     getMarketMedians(),
     getUniqueMakes(),
     getUniqueCities(),
+    getAvgDaysToSell(),
   ]);
 
   const listings: ScoredListing[] = raw
     .map((listing) => {
       const key = `${listing.make_normalized}|${listing.model_normalized}`;
       const ref = medians.get(key);
+      const avgDaysToSell = avgDays.get(key) ?? null;
       if (!ref || !listing.price_amount) {
         return {
           ...listing,
@@ -35,6 +38,7 @@ export default async function OpportunitiesPage() {
           market_median: 0,
           grade: "D",
           margin_usd: 0,
+          avg_days_to_sell: avgDaysToSell,
         };
       }
       const price = Number(listing.price_amount);
@@ -47,6 +51,7 @@ export default async function OpportunitiesPage() {
         market_median: ref.median,
         grade,
         margin_usd: margin,
+        avg_days_to_sell: avgDaysToSell,
       };
     })
     .sort((a, b) => b.discount_pct - a.discount_pct);
