@@ -1,5 +1,6 @@
 import Image from "next/image";
-import { MapPin, Clock, Gauge, ChevronDown, ExternalLink, Car } from "lucide-react";
+import Link from "next/link";
+import { MapPin, Clock, Gauge, ChevronDown, Car } from "lucide-react";
 import { formatUSD, formatKm, timeAgo, gradeColor } from "@/lib/utils";
 import type { Listing } from "@/lib/supabase";
 
@@ -18,11 +19,11 @@ export function ListingCard({
     listing.primary_image_url &&
     !listing.primary_image_url.includes("null");
 
+  const source = listing.source ?? (listing.fb_listing_id.startsWith("ML-") ? "mercadolibre" : "facebook");
+
   return (
-    <a
-      href={listing.listing_url}
-      target="_blank"
-      rel="noopener noreferrer"
+    <Link
+      href={`/listing/${encodeURIComponent(listing.fb_listing_id)}`}
       className="group bg-surface border border-border-subtle rounded-xl overflow-hidden hover:border-accent/30 transition-all duration-300 flex flex-col"
     >
       {/* Imagen */}
@@ -42,7 +43,7 @@ export function ListingCard({
           </div>
         )}
 
-        {/* Badge de grado */}
+        {/* Grade badge */}
         {grade !== "D" && (
           <div className="absolute top-3 left-3">
             <span
@@ -53,7 +54,7 @@ export function ListingCard({
           </div>
         )}
 
-        {/* Badge de descuento */}
+        {/* Discount badge */}
         {discount > 0 && (
           <div className="absolute top-3 right-3">
             <span className="inline-flex items-center px-2 py-1 rounded-md text-xs font-bold bg-accent/90 text-black">
@@ -62,7 +63,7 @@ export function ListingCard({
           </div>
         )}
 
-        {/* Bajadas de precio */}
+        {/* Price drops */}
         {listing.price_drop_count > 0 && (
           <div className="absolute bottom-3 left-3">
             <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-[10px] font-medium bg-black/60 text-warning backdrop-blur-sm">
@@ -72,10 +73,16 @@ export function ListingCard({
           </div>
         )}
 
-        {/* Link externo */}
-        <div className="absolute bottom-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity">
-          <span className="inline-flex items-center p-1.5 rounded-md bg-black/60 text-white backdrop-blur-sm">
-            <ExternalLink className="w-3 h-3" />
+        {/* Source badge */}
+        <div className="absolute bottom-3 right-3">
+          <span
+            className={`inline-flex items-center px-2 py-1 rounded-md text-[10px] font-medium backdrop-blur-sm ${
+              source === "mercadolibre"
+                ? "bg-yellow-500/20 text-yellow-300 border border-yellow-500/20"
+                : "bg-blue-500/20 text-blue-300 border border-blue-500/20"
+            }`}
+          >
+            {source === "mercadolibre" ? "ML" : "FB"}
           </span>
         </div>
       </div>
@@ -136,6 +143,6 @@ export function ListingCard({
           )}
         </div>
       </div>
-    </a>
+    </Link>
   );
 }

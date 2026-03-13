@@ -4,16 +4,24 @@ import {
   OpportunitiesView,
   ScoredListing,
 } from "@/components/opportunities-view";
-import { getOpportunities, getMarketStats, getMarketMedians } from "@/lib/queries";
+import {
+  getOpportunities,
+  getMarketStats,
+  getMarketMedians,
+  getUniqueMakes,
+  getUniqueCities,
+} from "@/lib/queries";
 import { discountToGrade } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
 
 export default async function OpportunitiesPage() {
-  const [raw, stats, medians] = await Promise.all([
+  const [raw, stats, medians, makes, cities] = await Promise.all([
     getOpportunities({ limit: 500 }),
     getMarketStats(),
     getMarketMedians(),
+    getUniqueMakes(),
+    getUniqueCities(),
   ]);
 
   const listings: ScoredListing[] = raw
@@ -47,11 +55,11 @@ export default async function OpportunitiesPage() {
     listings.filter((l) => l.grade === g).length;
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6 sm:space-y-8">
       {/* Header */}
       <div>
         <h2
-          className="text-2xl font-bold tracking-tight"
+          className="text-xl sm:text-2xl font-bold tracking-tight"
           style={{ fontFamily: "var(--font-display)" }}
         >
           Oportunidades
@@ -62,9 +70,9 @@ export default async function OpportunitiesPage() {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         <StatCard
-          label="Publicaciones Activas"
+          label="Publicaciones"
           value={stats.live.toLocaleString()}
           icon={Car}
         />
@@ -76,7 +84,7 @@ export default async function OpportunitiesPage() {
           accent
         />
         <StatCard
-          label="Vendidos / Bajados"
+          label="Vendidos"
           value={stats.sold.toLocaleString()}
           icon={TrendingDown}
         />
@@ -87,7 +95,7 @@ export default async function OpportunitiesPage() {
         />
       </div>
 
-      <OpportunitiesView listings={listings} />
+      <OpportunitiesView listings={listings} makes={makes} cities={cities} />
     </div>
   );
 }

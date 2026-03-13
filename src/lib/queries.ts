@@ -78,6 +78,53 @@ export async function getUniqueMakes(): Promise<string[]> {
   return rows.map((r) => r.make_normalized);
 }
 
+export async function getUniqueCities(): Promise<string[]> {
+  const rows = await sql`
+    SELECT DISTINCT location_city
+    FROM listings
+    WHERE vehicle_type = 'car'
+      AND status = 'live'
+      AND location_city IS NOT NULL
+    ORDER BY location_city
+  `;
+  return rows.map((r) => r.location_city);
+}
+
+export async function getListingById(id: string): Promise<Listing | null> {
+  const rows = await sql<Listing[]>`
+    SELECT * FROM listings WHERE fb_listing_id = ${id} LIMIT 1
+  `;
+  return rows[0] ?? null;
+}
+
+export async function getPriceHistory(listingDbId: number) {
+  return sql`
+    SELECT price_amount, price_currency, observed_at
+    FROM price_history
+    WHERE listing_id = ${listingDbId}
+    ORDER BY observed_at ASC
+  `;
+}
+
+export async function getSimilarListings(
+  make: string,
+  model: string,
+  excludeId: string,
+  limit = 6,
+): Promise<Listing[]> {
+  return sql<Listing[]>`
+    SELECT * FROM listings
+    WHERE vehicle_type = 'car'
+      AND status = 'live'
+      AND make_normalized = ${make}
+      AND model_normalized = ${model}
+      AND fb_listing_id != ${excludeId}
+      AND price_amount IS NOT NULL
+    ORDER BY first_seen_at DESC
+    LIMIT ${limit}
+  `;
+}
+
 export async function getMarketMedians(): Promise<
   Map<string, { median: number; count: number }>
 > {
