@@ -21,13 +21,13 @@
 
 /* Light theme overrides */
 html.light {
-  --color-background: #f8f8f6;
-  --color-foreground: #1a1a1e;
+  --color-background: #f5f5f4;
+  --color-foreground: #1c1c1e;
   --color-surface: #ffffff;
-  --color-surface-2: #f1f1ef;
-  --color-surface-3: #e8e8e5;
-  --color-border: #d4d4d0;
-  --color-border-subtle: #e5e5e1;
+  --color-surface-2: #f0f0ee;
+  --color-surface-3: #e5e5e3;
+  --color-border: #d1d5db;
+  --color-border-subtle: #e5e7eb;
   --color-accent: #059669;
   --color-accent-dim: #047857;
   --color-accent-glow: rgba(5, 150, 105, 0.12);

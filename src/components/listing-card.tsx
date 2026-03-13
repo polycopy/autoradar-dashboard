@@ -82,7 +82,7 @@ export function ListingCard({
         {/* Discount badge */}
         {discount > 0 && (
           <div className="absolute top-3 right-3">
-            <span className="inline-flex items-center px-2 py-1 rounded-md text-xs font-bold bg-accent/90 text-black">
+            <span className="inline-flex items-center px-2 py-1 rounded-md text-xs font-bold bg-accent/90 text-white dark:text-black">
               -{Math.round(discount)}%
             </span>
           </div>
@@ -91,7 +91,7 @@ export function ListingCard({
         {/* Price drops */}
         {listing.price_drop_count > 0 && (
           <div className="absolute bottom-3 left-3">
-            <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-[10px] font-medium bg-black/60 text-warning backdrop-blur-sm">
+            <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-[10px] font-medium bg-black/60 dark:text-warning text-amber-100 backdrop-blur-sm">
               <ChevronDown className="w-3 h-3" />
               {listing.price_drop_count}x baja
             </span>
@@ -103,8 +103,8 @@ export function ListingCard({
           <span
             className={`inline-flex items-center px-2 py-1 rounded-md text-[10px] font-medium backdrop-blur-sm ${
               source === "mercadolibre"
-                ? "bg-yellow-500/20 text-yellow-300 border border-yellow-500/20"
-                : "bg-blue-500/20 text-blue-300 border border-blue-500/20"
+                ? "bg-yellow-500/20 text-yellow-700 border border-yellow-500/30 dark:text-yellow-300 dark:border-yellow-500/20"
+                : "bg-blue-500/20 text-blue-700 border border-blue-500/30 dark:text-blue-300 dark:border-blue-500/20"
             }`}
           >
             {source === "mercadolibre" ? "ML" : "FB"}
@@ -166,7 +166,7 @@ export function ListingCard({
             {timeAgo(listing.first_seen_at)}
           </span>
           {listing.is_dealer && (
-            <span className="inline-flex items-center px-2 py-0.5 rounded bg-amber-500/10 text-[11px] text-amber-400 border border-amber-500/20">
+            <span className="inline-flex items-center px-2 py-0.5 rounded bg-amber-500/10 text-[11px] text-amber-700 dark:text-amber-400 border border-amber-500/20">
               Dealer
             </span>
           )}

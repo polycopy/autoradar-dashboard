@@ -148,7 +148,7 @@ export function ValuatorForm({ makes }: { makes: string[] }) {
         <button
           type="submit"
           disabled={loading}
-          className="flex items-center gap-2 px-6 py-2.5 rounded-lg bg-accent text-black font-semibold text-sm hover:bg-accent-dim transition-colors disabled:opacity-50"
+          className="flex items-center gap-2 px-6 py-2.5 rounded-lg bg-accent text-white dark:text-black font-semibold text-sm hover:bg-accent-dim transition-colors disabled:opacity-50"
         >
           {loading ? (
             <Search className="w-4 h-4 animate-spin" />

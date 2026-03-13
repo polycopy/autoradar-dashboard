@@ -50,8 +50,8 @@ export function Toast({
 
   const badgeBg =
     alert.grade === "A"
-      ? "bg-emerald-500/10 text-emerald-400"
-      : "bg-amber-500/10 text-amber-400";
+      ? "bg-emerald-500/10 text-emerald-700 dark:text-emerald-400"
+      : "bg-amber-500/10 text-amber-700 dark:text-amber-400";
 
   return (
     <div

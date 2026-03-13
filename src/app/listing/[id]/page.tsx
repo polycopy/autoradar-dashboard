@@ -124,7 +124,7 @@ export default async function ListingDetailPage({
                 </span>
               )}
               {discount > 0 && (
-                <span className="px-3 py-1.5 rounded-lg text-sm font-bold bg-accent/90 text-black">
+                <span className="px-3 py-1.5 rounded-lg text-sm font-bold bg-accent/90 text-white dark:text-black">
                   -{Math.round(discount)}% bajo mercado
                 </span>
               )}
@@ -135,8 +135,8 @@ export default async function ListingDetailPage({
               <span
                 className={`px-3 py-1.5 rounded-lg text-xs font-medium backdrop-blur-sm ${
                   source === "mercadolibre"
-                    ? "bg-yellow-500/20 text-yellow-300 border border-yellow-500/20"
-                    : "bg-blue-500/20 text-blue-300 border border-blue-500/20"
+                    ? "bg-yellow-500/20 text-yellow-700 border border-yellow-500/30 dark:text-yellow-300 dark:border-yellow-500/20"
+                    : "bg-blue-500/20 text-blue-700 border border-blue-500/30 dark:text-blue-300 dark:border-blue-500/20"
                 }`}
               >
                 {source === "mercadolibre" ? "MercadoLibre" : "Facebook"}
@@ -280,7 +280,7 @@ export default async function ListingDetailPage({
                 href={listing.listing_url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-accent text-black font-semibold text-sm hover:bg-accent-dim transition-colors"
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-accent text-white dark:text-black font-semibold text-sm hover:bg-accent-dim transition-colors"
               >
                 <ExternalLink className="w-4 h-4" />
                 Ver en {source === "mercadolibre" ? "MercadoLibre" : "Facebook"}

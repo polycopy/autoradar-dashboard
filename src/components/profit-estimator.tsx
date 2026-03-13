@@ -175,11 +175,11 @@ export function ProfitEstimator({
           <span
             className={`ml-2 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${
               grade === "A"
-                ? "bg-emerald-400/10 text-emerald-400"
+                ? "bg-emerald-500/10 text-emerald-700 dark:text-emerald-400"
                 : grade === "B"
-                  ? "bg-amber-400/10 text-amber-400"
+                  ? "bg-amber-500/10 text-amber-700 dark:text-amber-400"
                   : grade === "C"
-                    ? "bg-zinc-400/10 text-zinc-400"
+                    ? "bg-zinc-500/10 text-zinc-600 dark:text-zinc-400"
                     : "bg-zinc-600/10 text-zinc-500"
             }`}
           >
@@ -303,12 +303,12 @@ export function ProfitEstimator({
             <span
               className={`px-2 py-0.5 rounded text-xs font-bold ${
                 roi >= 15
-                  ? "bg-emerald-400/15 text-emerald-400"
+                  ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-400"
                   : roi >= 5
-                    ? "bg-amber-400/15 text-amber-400"
+                    ? "bg-amber-500/15 text-amber-700 dark:text-amber-400"
                     : roi >= 0
-                      ? "bg-zinc-400/15 text-zinc-400"
-                      : "bg-red-400/15 text-red-400"
+                      ? "bg-zinc-500/15 text-zinc-600 dark:text-zinc-400"
+                      : "bg-red-500/15 text-red-700 dark:text-red-400"
               }`}
               style={{ fontFamily: "var(--font-mono)" }}
             >

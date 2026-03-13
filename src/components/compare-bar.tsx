@@ -38,7 +38,7 @@ export function CompareBar() {
             <button
               onClick={handleCompare}
               disabled={selectedCount < 2}
-              className="flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-xs font-bold bg-accent text-black hover:bg-accent/90 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+              className="flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-xs font-bold bg-accent text-white dark:text-black hover:bg-accent/90 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
             >
               Comparar
             </button>

@@ -122,22 +122,9 @@ export function Sidebar() {
 
         {/* Status */}
         <div className="p-4 border-t border-border-subtle">
-          <div className="flex items-center justify-between px-3 py-2">
-            <div className="flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-accent pulse-live" />
-              <span className="text-xs text-muted">Scraper activo</span>
-            </div>
-            <button
-              onClick={() => setAlertsEnabled(!alertsEnabled)}
-              title={alertsEnabled ? "Alertas activadas" : "Alertas desactivadas"}
-              className={`w-7 h-7 flex items-center justify-center rounded-lg transition-colors ${
-                alertsEnabled
-                  ? "text-accent hover:bg-accent/10"
-                  : "text-muted/40 hover:text-muted hover:bg-surface-2"
-              }`}
-            >
-              {alertsEnabled ? <Bell className="w-3.5 h-3.5" /> : <BellOff className="w-3.5 h-3.5" />}
-            </button>
+          <div className="flex items-center gap-2 px-3 py-2">
+            <span className="w-2 h-2 rounded-full bg-accent pulse-live" />
+            <span className="text-xs text-muted">Scraper activo</span>
           </div>
           <div className="px-3 mt-1 flex items-center justify-between">
             <span
@@ -146,7 +133,20 @@ export function Sidebar() {
             >
               v0.1.0 — Uruguay
             </span>
-            <ThemeToggle />
+            <div className="flex items-center gap-0.5">
+              <button
+                onClick={() => setAlertsEnabled(!alertsEnabled)}
+                title={alertsEnabled ? "Alertas activadas" : "Alertas desactivadas"}
+                className={`w-8 h-8 flex items-center justify-center rounded-lg transition-colors ${
+                  alertsEnabled
+                    ? "text-accent hover:bg-accent/10"
+                    : "text-muted/40 hover:text-muted hover:bg-surface-2"
+                }`}
+              >
+                {alertsEnabled ? <Bell className="w-3.5 h-3.5" /> : <BellOff className="w-3.5 h-3.5" />}
+              </button>
+              <ThemeToggle />
+            </div>
           </div>
         </div>
       </aside>

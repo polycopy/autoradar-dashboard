@@ -25,13 +25,13 @@ export function timeAgo(date: string): string {
 export function gradeColor(grade: string): string {
   switch (grade) {
     case "A":
-      return "text-emerald-400 bg-emerald-400/10 border-emerald-400/30";
+      return "text-emerald-700 bg-emerald-500/10 border-emerald-500/30 dark:text-emerald-400 dark:bg-emerald-400/10 dark:border-emerald-400/30";
     case "B":
-      return "text-amber-400 bg-amber-400/10 border-amber-400/30";
+      return "text-amber-700 bg-amber-500/10 border-amber-500/30 dark:text-amber-400 dark:bg-amber-400/10 dark:border-amber-400/30";
     case "C":
-      return "text-zinc-400 bg-zinc-400/10 border-zinc-400/30";
+      return "text-zinc-600 bg-zinc-500/10 border-zinc-500/30 dark:text-zinc-400 dark:bg-zinc-400/10 dark:border-zinc-400/30";
     default:
-      return "text-zinc-600 bg-zinc-600/10 border-zinc-600/30";
+      return "text-zinc-500 bg-zinc-400/10 border-zinc-400/30 dark:text-zinc-600 dark:bg-zinc-600/10 dark:border-zinc-600/30";
   }
 }
 
